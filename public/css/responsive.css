@@ -24,7 +24,6 @@
     margin-top: 0px;
   }
 }
-
 /* Móviles grandes (<=768px) */
 @media (max-width: 768px) {
   body {
@@ -37,27 +36,33 @@
     align-items: center;
     justify-content: space-between;
     position: relative;
+    z-index: 100; /* encima del fondo */
   }
 
   /* Menú hamburguesa oculto/visible */
   nav {
     display: none;
     flex-direction: column;
-    width: 100%;
-    background: var(--color-primary);
-    position: absolute;
-    top: 60px;
+    justify-content: center;   /* centra verticalmente */
+    align-items: center;       /* centra horizontalmente */
+    position: fixed;           /* ocupa toda la pantalla */
+    top: 0;
     left: 0;
-    padding: 10px 0;
+    width: 100vw;
+    height: 100vh;
+    background: var(--color-primary-blur);
     z-index: 99;
   }
 
   nav a {
-    padding: 12px;
+    padding: 15px 0;
     text-align: center;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    display: block;
+    font-size: 1.5rem;
     color: var(--color-white);
+    width: 100%;
+    background: var(--color-primary-blur);
+    box-sizing: border-box;
+    margin-left: 0px;
   }
 
   nav.show {
@@ -71,6 +76,7 @@
     font-size: 1.8rem;
     color: var(--color-white);
     cursor: pointer;
+    z-index: 101; /* encima del menú */
   }
 
   /* Secciones en columnas */
@@ -84,7 +90,6 @@
   .products-grid,
   .gallery-grid,
   .testimonials-grid {
-    
     gap: 20px;
   }
 
@@ -93,6 +98,7 @@
     gap: 20px;
   }
 }
+
 
 /* Móviles pequeños (<=480px) */
 @media (max-width: 480px) {
