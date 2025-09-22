@@ -19,12 +19,11 @@
   height: 100%;
   background: url("../img/background.png") no-repeat center center/cover;
   filter: blur(22px); /* ajusta intensidad del blur */
-  z-index: -1; /* detrás del contenido */
+  z-index: -10; /* detrás del contenido */
 }
 
 /* Opcional: para que el contenido no se vea demasiado borroso */
-body,
-.body-wrapper > * {
+body{
   position: relative;
   z-index: 1;
 }
@@ -32,9 +31,9 @@ body,
 
 /* Variables de colores */
 :root {
-  --color-primary: #41ade3;
-  --color-primary-blur: #41ade378;
-  --color-accent: #a4cd49;
+  --color-primary: #224369;
+  --color-primary-blur: #3e5e829b;
+  --color-accent: #e79b21;
   --color-light: #f9f9f9;
   --color-light-blur: #f9f9f991;
   --color-dark: #333;
@@ -58,7 +57,7 @@ body {
   font-family: "Segoe UI", Arial, sans-serif;
   line-height: 1.6;
   color: var(--color-dark);
-  background-color: var(--color-white);
+  
 }
 
 /* Contenedor general */
@@ -73,10 +72,13 @@ header {
   background: var(--color-primary-blur);
   color: var(--color-white);
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   padding: 15px 20px;
-  position: relative;
+  position: fixed;
+  backdrop-filter: blur(25px);
+  width: 100%;
+  z-index: 10;
 }
 
 header a {
@@ -102,11 +104,13 @@ header a:hover {
 }
 /* Hero */
 .hero {
+  
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 30px;
-  padding: 60px 20px;
+  padding: 6rem 20px 60px 20px;
+
 }
 
 .hero h1 {
@@ -150,6 +154,7 @@ section {
 
 .bg-light {
   background: var(--color-light-blur);
+  backdrop-filter: blur(25px);
 }
 
 .text-center {
@@ -246,11 +251,12 @@ section {
 
 /* Footer */
 footer {
-  background: var(--color-primary);
+  background: var(--color-primary-blur);
   color: var(--color-white);
   text-align: center;
   padding: 20px;
   margin-top: 40px;
+  backdrop-filter: blur(25px);
 }
 
 footer a {
