@@ -92,6 +92,11 @@ header a:hover {
   text-decoration: underline;
 }
 
+.logodiv img {
+  height: 8vh;
+  width: auto;
+}
+
 /* Ocultar el botón hamburguesa en desktop */
 .menu-toggle {
     display: none;
