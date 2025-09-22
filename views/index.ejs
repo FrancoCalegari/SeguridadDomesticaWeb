@@ -6,18 +6,31 @@
   <link rel="stylesheet" href="./css/styles.css">
   <link rel="stylesheet" href="./css/responsive.css">
   <script src="https://kit.fontawesome.com/274f77f0e3.js" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-  <header>
-    <a href="#">
-      <strong>JS AUTOMATIZACIONES</strong>
-    </a>
-    <nav>
-      <a href="#products">Productos</a>
-      <a href="#testimonials">Testimonios</a>
-      <a href="#contact">Contacto</a>
-    </nav>
-  </header>
+<div class="body-wrapper">
+ <header>
+    <div class="logodiv">
+        <a href="/" class="logo">
+            <strong>JS AUTOMATIZACIONES</strong>
+        </a>
+        <img src="./img/logo.png" alt="" style="width: 5vw;">
+    </div>
+  
+
+  <!-- Botón Hamburguesa -->
+  <button class="menu-toggle" id="menu-toggle">
+    <i class="fa-solid fa-bars"></i>
+  </button>
+
+  <nav id="navbar">
+    <a href="#products">Productos</a>
+    <a href="#testimonials">Testimonios</a>
+    <a href="#contact">Contacto</a>
+  </nav>
+</header>
+
 
   <main>
     <!-- Hero -->
@@ -110,5 +123,7 @@
     
 
   </footer>
+</div>
+  <script src="./js/script.js"></script>
 </body>
 </html>

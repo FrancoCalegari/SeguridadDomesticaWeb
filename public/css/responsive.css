@@ -3,7 +3,7 @@
    Ajustes para pantallas pequeñas
 ========================= */
 
-/* Tablets y pantallas medianas */
+/* Tablets y pantallas medianas (<=1024px) */
 @media (max-width: 1024px) {
   .hero {
     flex-direction: column;
@@ -21,35 +21,71 @@
   }
 
   header nav {
-    margin-top: 10px;
+    margin-top: 0px;
   }
 }
 
-/* Móviles grandes */
+/* Móviles grandes (<=768px) */
 @media (max-width: 768px) {
   body {
     font-size: 15px;
   }
 
+  /* Header con hamburguesa */
   header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+
+  /* Menú hamburguesa oculto/visible */
+  nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    background: var(--color-primary);
+    position: absolute;
+    top: 60px;
+    left: 0;
+    padding: 10px 0;
+    z-index: 99;
+  }
+
+  nav a {
+    padding: 12px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    display: block;
+    color: var(--color-white);
+  }
+
+  nav.show {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    color: var(--color-white);
+    cursor: pointer;
+  }
+
+  /* Secciones en columnas */
+  .hero,
+  .contact-grid {
     flex-direction: column;
     text-align: center;
-  }
-
-  header nav a {
-    display: inline-block;
-    margin: 10px;
-  }
-
-  .hero {
-    flex-direction: column;
     gap: 20px;
   }
 
   .products-grid,
-  .testimonials-grid,
-  .gallery-grid {
-    grid-template-columns: 1fr 1fr;
+  .gallery-grid,
+  .testimonials-grid {
+    
+    gap: 20px;
   }
 
   .contact-grid {
@@ -58,7 +94,7 @@
   }
 }
 
-/* Móviles pequeños */
+/* Móviles pequeños (<=480px) */
 @media (max-width: 480px) {
   .hero h1 {
     font-size: 1.5rem;
@@ -66,12 +102,6 @@
 
   .hero p {
     font-size: 0.95rem;
-  }
-
-  .products-grid,
-  .testimonials-grid,
-  .gallery-grid {
-    grid-template-columns: 1fr;
   }
 
   .btn {
