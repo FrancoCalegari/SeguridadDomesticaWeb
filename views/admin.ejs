@@ -1,34 +1,51 @@
-<h3>Agregar Producto</h3>
-<form action="/admin/add" method="post">
-  <input type="text" name="name" placeholder="Nombre" required>
-  <input type="text" name="description" placeholder="Descripción" required>
-  <input type="url" name="imageUrl" placeholder="URL de la imagen" required>
-  <button type="submit">Agregar</button>
-</form>
 
-<h3>Lista de Productos</h3>
-<table border="1">
-  <tr>
-    <th>ID</th><th>Nombre</th><th>Descripción</th><th>Imagen</th><th>Acciones</th>
-  </tr>
-  <% productos.forEach(p => { %>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="./css/admin.css">
+</head>
+<body>
+<div class="addProductDiv">
+    <h1>Agregar Producto</h1>
+    <form action="/admin/add" method="post">
+    <input type="text" name="name" placeholder="Nombre" required>
+    <input type="text" name="description" placeholder="Descripción" required>
+    <input type="url" name="imageUrl" placeholder="URL de la imagen" required>
+    <button type="submit">Agregar</button>
+    </form>
+</div>
+
+<div class="productView">
+    <h3>Lista de Productos</h3>
+    <table border="1">
     <tr>
-      <td><%= p.id %></td>
-      <td>
-        <form action="/admin/edit/<%= p.id %>" method="post" style="display:inline;">
-          <input type="text" name="name" value="<%= p.name %>" required>
-          <input type="text" name="description" value="<%= p.description %>" required>
-          <input type="url" name="imageUrl" value="<%= p.imageUrl %>" required>
-          <button type="submit">Editar</button>
-        </form>
-      </td>
-      <td><%= p.description %></td>
-      <td><img src="<%= p.imageUrl %>" alt="imagen" width="100"></td>
-      <td>
-        <form action="/admin/delete/<%= p.id %>" method="post" style="display:inline;">
-          <button type="submit">Eliminar</button>
-        </form>
-      </td>
+        <th>ID</th><th>Nombre</th><th>Descripción</th><th>Imagen</th><th>Acciones</th>
     </tr>
-  <% }) %>
-</table>
+    <% productos.forEach(p => { %>
+        <tr>
+        <td><%= p.id %></td>
+        <td>
+            <form action="/admin/edit/<%= p.id %>" method="post" style="display:inline;">
+            <input type="text" name="name" value="<%= p.name %>" required>
+            <input type="text" name="description" value="<%= p.description %>" required>
+            <input type="url" name="imageUrl" value="<%= p.imageUrl %>" required>
+            <button type="submit">Editar</button>
+            </form>
+        </td>
+        <td><%= p.description %></td>
+        <td><img src="<%= p.imageUrl %>" alt="imagen" width="100"></td>
+        <td>
+            <form action="/admin/delete/<%= p.id %>" method="post" style="display:inline;">
+            <button type="submit">Eliminar</button>
+            </form>
+        </td>
+        </tr>
+    <% }) %>
+    </table>
+</div>
+
+</body>
+</html>

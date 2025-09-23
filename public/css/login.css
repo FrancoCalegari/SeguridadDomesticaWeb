@@ -1,0 +1,82 @@
+/* =========================
+   Login Page Styles
+========================= */
+
+* {
+    box-sizing: border-box;
+}
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #224369, #3e5e82);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  color: #333;
+  
+}
+
+/* Card de login */
+.loginCard {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  
+}
+
+.loginCard h2 {
+  margin-bottom: 25px;
+  color: #224369;
+  font-size: 2rem;
+}
+
+.loginCard p {
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+/* Inputs */
+.loginCard input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.loginCard input:focus {
+  border-color: #224369;
+  outline: none;
+  box-shadow: 0 0 5px #22436950;
+}
+
+/* Botón */
+.loginCard button {
+  width: 100%;
+  padding: 12px;
+  background: #224369;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.loginCard button:hover {
+  background: #1a3350;
+  transform: translateY(-2px);
+}
+
+/* Mensaje de error */
+.loginCard p[style*="color:red"] {
+  font-weight: bold;
+}
