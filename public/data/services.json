@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "name": "Cámaras de Vigilancia",
+    "description": "Monitoreo 24/7 con cámaras HD de última generación. Acceso remoto desde tu smartphone.",
+    "imageUrl": "https://thumbs.dreamstime.com/b/c%C3%A1mara-de-seguridad-moderna-instalada-fuera-un-hogar-elegante-sistema-vigilancia-protecci%C3%B3n-domiciliaria-concepto-residencial-386923288.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Sistemas de Alarma",
+    "description": "Alarmas sonoras y silenciosas conectadas a nuestra central de monitoreo para una respuesta inmediata.",
+    "imageUrl": "https://officialpress.es/wp-content/uploads/2022/06/alarma.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Cerraduras Inteligentes",
+    "description": "Controla el acceso a tu hogar sin llaves. Otorga permisos temporales y recibe notificaciones.",
+    "imageUrl": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM_xp27weikpZsgLUX-EwGmkYHa8m-bTd0-Q&s"
+  }
+]

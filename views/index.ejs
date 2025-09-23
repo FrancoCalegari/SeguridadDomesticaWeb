@@ -43,15 +43,35 @@
       </div>
     </section>
 
+ 
+    <!-- Servicios -->
+    <section id="services">
+      <div class="container text-center">
+        <h2>Nuestros Servicios</h2>
+        <p>Soluciones profesionales para la seguridad de tu hogar y empresa.</p>
+        <div class="services-grid">
+          <% services.forEach(service => { %>
+            <div class="card">
+              <img src="<%= service.imageUrl %>" alt="<%= service.description %>">
+              <div class="p-4">
+                <h3><%= service.name %></h3>
+                <p><%= service.description %></p>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
     <!-- Productos -->
     <section id="products">
       <div class="container text-center">
-        <h2>Protección Integral para tu Hogar</h2>
-        <p>Ofrecemos una gama completa de soluciones de seguridad para adaptarnos a tus necesidades específicas.</p>
+        <h2>Productos Destacados</h2>
+        <p>Equipos y dispositivos de última tecnología para tu seguridad.</p>
         <div class="products-grid">
           <% products.forEach(product => { %>
             <div class="card">
-              <img src="<%= product.image.imageUrl %>" alt="<%= product.description %>">
+              <img src="<%= product.imageUrl %>" alt="<%= product.description %>">
               <div class="p-4">
                 <h3><%= product.name %></h3>
                 <p><%= product.description %></p>
@@ -61,7 +81,6 @@
         </div>
       </div>
     </section>
-
     <!-- Galería -->
     <section id="gallery" class="bg-light">
       <div class="container text-center">
