@@ -97,6 +97,20 @@
     grid-template-columns: 1fr;
     gap: 20px;
   }
+  .hero img {
+    max-width: 100%;
+    border-radius: 12px;
+    height: 29vh;
+  }
+  .card {
+    flex: 0 0 250px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 

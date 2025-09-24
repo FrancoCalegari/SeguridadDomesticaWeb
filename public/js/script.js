@@ -4,7 +4,14 @@ const navbar = document.getElementById("navbar");
 
 toggle.addEventListener("click", () => {
   navbar.classList.toggle("show");
+
+  if (navbar.classList.contains("show")) {
+    document.body.style.overflow = "hidden"; // bloquea scroll
+  } else {
+    document.body.style.overflow = ""; // restaura scroll
+  }
 });
+
 
 let currentIndex = 0;
 

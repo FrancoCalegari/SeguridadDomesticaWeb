@@ -171,15 +171,32 @@ section {
   color: var(--color-primary);
 }
 
-/* Productos */
+/* Productos como carrusel */
 .products-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  display: flex;
   gap: 20px;
   margin-top: 30px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 1rem;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #ccc transparent;
+}
+
+/* Ocultar barra en Chrome */
+.products-grid::-webkit-scrollbar {
+  height: 8px;
+}
+.products-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+.products-grid::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
 }
 
 .card {
+  flex: 0 0 250px; /* ancho fijo de cada ítem */
   background: var(--color-white);
   border: 1px solid #ddd;
   border-radius: 12px;
@@ -187,6 +204,7 @@ section {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
   transition: transform 0.2s ease;
   padding: 1rem;
+  scroll-snap-align: start;
 }
 
 .card:hover {
@@ -194,10 +212,12 @@ section {
 }
 
 .card img {
-  width: 15vw;
-  height: fit-content;
+  width: 100%;
+  height: 180px;
   object-fit: cover;
+  border-radius: 8px;
 }
+
 
 /* Galería */
 .gallery-grid {
@@ -389,4 +409,29 @@ footer a:hover {
   font-size: 1rem;
   color: var(--color-muted);
   line-height: 1.5;
+}
+
+/* Botón flotante WhatsApp */
+.whatsapp-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #25d366;
+  color: #fff;
+  font-size: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  z-index: 9;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.whatsapp-float:hover {
+  background-color: #20b955;
+  transform: scale(1.1);
 }
