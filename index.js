@@ -1,3 +1,5 @@
+// index.js
+
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
@@ -17,23 +19,25 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Función genérica para leer JSON
 function loadJSON(file) {
-  const data = fs.readFileSync(path.join(__dirname, "public", "data", file), "utf-8");
-  return JSON.parse(data);
+  try {
+    const data = fs.readFileSync(
+      path.join(__dirname, "public", "data", file), // 👈 siempre dentro de public/data
+      "utf-8"
+    );
+    return JSON.parse(data);
+  } catch (err) {
+    console.error(`Error leyendo ${file}:`, err);
+    return [];
+  }
 }
 
-// Datos fijos (testimonios y galería)
-const testimonials = [
-  { name: "Familia Gonzalez", quote: "Desde que instalamos el sistema de SafeHome, nos sentimos mucho más seguros." },
-  { name: "Maria Rodriguez", quote: "La instalación fue rápida y profesional. Las cámaras tienen una calidad de imagen increíble." },
-  { name: "Carlos Perez", quote: "Poder controlar todo desde el celular es una maravilla. Recomiendo totalmente." }
-];
+function saveJSON(file, data) {
+  fs.writeFileSync(
+    path.join(__dirname, "public", "data", file), // 👈 también guardamos en public/data
+    JSON.stringify(data, null, 2)
+  );
+}
 
-const galleryImages = [
-  { id: "gallery-1", imageUrl: "https://picsum.photos/seed/gallery1/800/600", description: "Instalación 1" },
-  { id: "gallery-2", imageUrl: "https://picsum.photos/seed/gallery2/800/600", description: "Instalación 2" },
-  { id: "gallery-3", imageUrl: "https://picsum.photos/seed/gallery3/800/600", description: "Instalación 3" },
-  { id: "gallery-4", imageUrl: "https://picsum.photos/seed/gallery4/800/600", description: "Instalación 4" }
-];
 
 // Configurar sesión
 app.use(session({
@@ -66,13 +70,20 @@ app.get("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
 
-// ADMIN CRUD
+// ===============================
+// ADMIN DASHBOARD
+// ===============================
 app.get("/admin", isAuth, (req, res) => {
   const productos = loadJSON("products.json");
-  res.render("admin", { productos });
+  const servicios = loadJSON("services.json");
+  const testimonios = loadJSON("testimonials.json");
+  const galeria = loadJSON("gallery.json");
+  res.render("admin", { productos, servicios, testimonios, galeria });
 });
 
-// Crear producto
+// ===============================
+// CRUD PRODUCTOS
+// ===============================
 app.post("/admin/add", isAuth, (req, res) => {
   let productos = loadJSON("products.json");
   const nuevo = {
@@ -82,11 +93,10 @@ app.post("/admin/add", isAuth, (req, res) => {
     imageUrl: req.body.imageUrl
   };
   productos.push(nuevo);
-  fs.writeFileSync(path.join(__dirname, "public", "data", "products.json"), JSON.stringify(productos, null, 2));
+  saveJSON("products.json", productos);
   res.redirect("/admin");
 });
 
-// Editar producto
 app.post("/admin/edit/:id", isAuth, (req, res) => {
   let productos = loadJSON("products.json");
   productos = productos.map(p =>
@@ -94,22 +104,91 @@ app.post("/admin/edit/:id", isAuth, (req, res) => {
       ? { ...p, name: req.body.name, description: req.body.description, imageUrl: req.body.imageUrl }
       : p
   );
-  fs.writeFileSync(path.join(__dirname, "public", "data", "products.json"), JSON.stringify(productos, null, 2));
+  saveJSON("products.json", productos);
   res.redirect("/admin");
 });
 
-// Eliminar producto
 app.post("/admin/delete/:id", isAuth, (req, res) => {
   let productos = loadJSON("products.json");
   productos = productos.filter(p => p.id != req.params.id);
-  fs.writeFileSync(path.join(__dirname, "public", "data", "products.json"), JSON.stringify(productos, null, 2));
+  saveJSON("products.json", productos);
   res.redirect("/admin");
 });
 
-// Ruta principal (index)
+// ===============================
+// CRUD TESTIMONIOS
+// ===============================
+app.post("/admin/testimonial/add", isAuth, (req, res) => {
+  let testimonios = loadJSON("testimonials.json");
+  const nuevo = {
+    id: Date.now(),
+    name: req.body.name,
+    quote: req.body.quote
+  };
+  testimonios.push(nuevo);
+  saveJSON("testimonials.json", testimonios);
+  res.redirect("/admin");
+});
+
+app.post("/admin/testimonial/edit/:id", isAuth, (req, res) => {
+  let testimonios = loadJSON("testimonials.json");
+  testimonios = testimonios.map(t =>
+    t.id == req.params.id
+      ? { ...t, name: req.body.name, quote: req.body.quote }
+      : t
+  );
+  saveJSON("testimonials.json", testimonios);
+  res.redirect("/admin");
+});
+
+app.post("/admin/testimonial/delete/:id", isAuth, (req, res) => {
+  let testimonios = loadJSON("testimonials.json");
+  testimonios = testimonios.filter(t => t.id != req.params.id);
+  saveJSON("testimonials.json", testimonios);
+  res.redirect("/admin");
+});
+
+// ===============================
+// CRUD GALERIA
+// ===============================
+app.post("/admin/gallery/add", isAuth, (req, res) => {
+  let galeria = loadJSON("gallery.json");
+  const nuevo = {
+    id: Date.now(),
+    imageUrl: req.body.imageUrl,
+    description: req.body.description
+  };
+  galeria.push(nuevo);
+  saveJSON("gallery.json", galeria);
+  res.redirect("/admin");
+});
+
+app.post("/admin/gallery/edit/:id", isAuth, (req, res) => {
+  let galeria = loadJSON("gallery.json");
+  galeria = galeria.map(g =>
+    g.id == req.params.id
+      ? { ...g, imageUrl: req.body.imageUrl, description: req.body.description }
+      : g
+  );
+  saveJSON("gallery.json", galeria);
+  res.redirect("/admin");
+});
+
+app.post("/admin/gallery/delete/:id", isAuth, (req, res) => {
+  let galeria = loadJSON("gallery.json");
+  galeria = galeria.filter(g => g.id != req.params.id);
+  saveJSON("gallery.json", galeria);
+  res.redirect("/admin");
+});
+
+// ===============================
+// RUTA PRINCIPAL
+// ===============================
 app.get("/", (req, res) => {
   const products = loadJSON("products.json");
-  const services = loadJSON("services.json"); // 👈 nuevo
+  const services = loadJSON("services.json");
+  const testimonials = loadJSON("testimonials.json");
+  const galleryImages = loadJSON("gallery.json");
   res.render("index", { title: "Inicio", products, services, testimonials, galleryImages });
 });
 

@@ -1,51 +1,132 @@
-
+<!-- admin.ejs -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="./css/admin.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="./css/admin.css">
 </head>
 <body>
-<div class="addProductDiv">
+  <!-- =================== -->
+  <!-- CRUD PRODUCTOS -->
+  <!-- =================== -->
+  <div class="addProductDiv">
     <h1>Agregar Producto</h1>
     <form action="/admin/add" method="post">
-    <input type="text" name="name" placeholder="Nombre" required>
-    <input type="text" name="description" placeholder="Descripción" required>
-    <input type="url" name="imageUrl" placeholder="URL de la imagen" required>
-    <button type="submit">Agregar</button>
+      <input type="text" name="name" placeholder="Nombre" required>
+      <input type="text" name="description" placeholder="Descripción" required>
+      <input type="url" name="imageUrl" placeholder="URL de la imagen" required>
+      <button type="submit">Agregar</button>
     </form>
-</div>
+  </div>
 
-<div class="productView">
+  <div class="productView">
     <h3>Lista de Productos</h3>
     <table border="1">
-    <tr>
+      <tr>
         <th>ID</th><th>Nombre</th><th>Descripción</th><th>Imagen</th><th>Acciones</th>
-    </tr>
-    <% productos.forEach(p => { %>
+      </tr>
+      <% productos.forEach(p => { %>
         <tr>
-        <td><%= p.id %></td>
-        <td>
+          <td><%= p.id %></td>
+          <td>
             <form action="/admin/edit/<%= p.id %>" method="post" style="display:inline;">
-            <input type="text" name="name" value="<%= p.name %>" required>
-            <input type="text" name="description" value="<%= p.description %>" required>
-            <input type="url" name="imageUrl" value="<%= p.imageUrl %>" required>
-            <button type="submit">Editar</button>
+              <input type="text" name="name" value="<%= p.name %>" required>
+              <input type="text" name="description" value="<%= p.description %>" required>
+              <input type="url" name="imageUrl" value="<%= p.imageUrl %>" required>
+              <button type="submit">Editar</button>
             </form>
-        </td>
-        <td><%= p.description %></td>
-        <td><img src="<%= p.imageUrl %>" alt="imagen" width="100"></td>
-        <td>
+          </td>
+          <td><%= p.description %></td>
+          <td><img src="<%= p.imageUrl %>" alt="imagen" width="100"></td>
+          <td>
             <form action="/admin/delete/<%= p.id %>" method="post" style="display:inline;">
-            <button type="submit">Eliminar</button>
+              <button type="submit">Eliminar</button>
             </form>
-        </td>
+          </td>
         </tr>
-    <% }) %>
+      <% }) %>
     </table>
-</div>
+  </div>
+
+  <!-- =================== -->
+  <!-- CRUD TESTIMONIOS -->
+  <!-- =================== -->
+  <div class="addTestimonialDiv">
+    <h1>Agregar Testimonio</h1>
+    <form action="/admin/testimonial/add" method="post">
+      <input type="text" name="name" placeholder="Nombre" required>
+      <input type="text" name="quote" placeholder="Cita" required>
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+
+  <div class="testimonialView">
+    <h3>Lista de Testimonios</h3>
+    <table border="1">
+      <tr>
+        <th>ID</th><th>Nombre</th><th>Cita</th><th>Acciones</th>
+      </tr>
+      <% testimonios.forEach(t => { %>
+        <tr>
+          <td><%= t.id %></td>
+          <td>
+            <form action="/admin/testimonial/edit/<%= t.id %>" method="post" style="display:inline;">
+              <input type="text" name="name" value="<%= t.name %>" required>
+              <input type="text" name="quote" value="<%= t.quote %>" required>
+              <button type="submit">Editar</button>
+            </form>
+          </td>
+          <td><%= t.quote %></td>
+          <td>
+            <form action="/admin/testimonial/delete/<%= t.id %>" method="post" style="display:inline;">
+              <button type="submit">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+  </div>
+
+  <!-- =================== -->
+  <!-- CRUD GALERIA -->
+  <!-- =================== -->
+  <div class="addGalleryDiv">
+    <h1>Agregar Imagen a Galería</h1>
+    <form action="/admin/gallery/add" method="post">
+      <input type="url" name="imageUrl" placeholder="URL de la imagen" required>
+      <input type="text" name="description" placeholder="Descripción" required>
+      <button type="submit">Agregar</button>
+    </form>
+  </div>
+
+  <div class="galleryView">
+    <h3>Lista de Imágenes</h3>
+    <table border="1">
+      <tr>
+        <th>ID</th><th>Imagen</th><th>Descripción</th><th>Acciones</th>
+      </tr>
+      <% galeria.forEach(g => { %>
+        <tr>
+          <td><%= g.id %></td>
+          <td><img src="<%= g.imageUrl %>" width="100"></td>
+          <td>
+            <form action="/admin/gallery/edit/<%= g.id %>" method="post" style="display:inline;">
+              <input type="url" name="imageUrl" value="<%= g.imageUrl %>" required>
+              <input type="text" name="description" value="<%= g.description %>" required>
+              <button type="submit">Editar</button>
+            </form>
+          </td>
+          <td>
+            <form action="/admin/gallery/delete/<%= g.id %>" method="post" style="display:inline;">
+              <button type="submit">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </table>
+  </div>
 
 </body>
 </html>
