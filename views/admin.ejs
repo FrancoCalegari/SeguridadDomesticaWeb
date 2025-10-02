@@ -89,44 +89,53 @@
     </table>
   </div>
 
-  <!-- =================== -->
-  <!-- CRUD GALERIA -->
-  <!-- =================== -->
-  <div class="addGalleryDiv">
-    <h1>Agregar Imagen a Galería</h1>
-    <form action="/admin/gallery/add" method="post">
-      <input type="url" name="imageUrl" placeholder="URL de la imagen" required>
-      <input type="text" name="description" placeholder="Descripción" required>
-      <button type="submit">Agregar</button>
-    </form>
-  </div>
+ <!-- =================== -->
+<!-- CRUD GALERIA -->
+<!-- =================== -->
+<div class="addGalleryDiv">
+  <h1>Agregar a Galería</h1>
+  <form action="/admin/gallery/add" method="post" enctype="multipart/form-data">
+    <input type="file" name="file" accept="image/*,video/*,audio/*" required>
+    <input type="text" name="description" placeholder="Descripción" required>
+    <button type="submit">Agregar</button>
+  </form>
+</div>
 
-  <div class="galleryView">
-    <h3>Lista de Imágenes</h3>
-    <table border="1">
+<div class="galleryView">
+  <h3>Lista de Archivos en Galería</h3>
+  <table border="1">
+    <tr>
+      <th>ID</th><th>Archivo</th><th>Descripción</th><th>Acciones</th>
+    </tr>
+    <% galeria.forEach(g => { %>
       <tr>
-        <th>ID</th><th>Imagen</th><th>Descripción</th><th>Acciones</th>
+        <td><%= g.id %></td>
+        <td>
+          <% if (g.type === "image") { %>
+            <img src="<%= g.fileUrl %>" width="100">
+          <% } else if (g.type === "video") { %>
+            <video src="<%= g.fileUrl %>" width="200" controls></video>
+          <% } else if (g.type === "audio") { %>
+            <audio src="<%= g.fileUrl %>" controls></audio>
+          <% } %>
+        </td>
+        <td>
+          <form action="/admin/gallery/edit/<%= g.id %>" method="post" enctype="multipart/form-data" style="display:inline;">
+            <input type="file" name="file" accept="image/*,video/*,audio/*">
+            <input type="text" name="description" value="<%= g.description %>" required>
+            <button type="submit">Editar</button>
+          </form>
+        </td>
+        <td>
+          <form action="/admin/gallery/delete/<%= g.id %>" method="post" style="display:inline;">
+            <button type="submit">Eliminar</button>
+          </form>
+        </td>
       </tr>
-      <% galeria.forEach(g => { %>
-        <tr>
-          <td><%= g.id %></td>
-          <td><img src="<%= g.imageUrl %>" width="100"></td>
-          <td>
-            <form action="/admin/gallery/edit/<%= g.id %>" method="post" style="display:inline;">
-              <input type="url" name="imageUrl" value="<%= g.imageUrl %>" required>
-              <input type="text" name="description" value="<%= g.description %>" required>
-              <button type="submit">Editar</button>
-            </form>
-          </td>
-          <td>
-            <form action="/admin/gallery/delete/<%= g.id %>" method="post" style="display:inline;">
-              <button type="submit">Eliminar</button>
-            </form>
-          </td>
-        </tr>
-      <% }) %>
-    </table>
-  </div>
+    <% }) %>
+  </table>
+</div>
+
 
 </body>
 </html>

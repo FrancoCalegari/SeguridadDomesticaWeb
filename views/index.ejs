@@ -103,12 +103,19 @@
       <div class="container text-center">
         <h2>Instalaciones Recientes</h2>
         <div class="gallery-grid">
-          <% galleryImages.forEach(image => { %>
-            <img src="<%= image.imageUrl %>" alt="<%= image.description %>">
+          <% galeria.forEach(item => { %>
+            <% if (item.type === "image") { %>
+              <img src="<%= item.fileUrl %>" alt="<%= item.description %>">
+            <% } else if (item.type === "video") { %>
+              <video src="<%= item.fileUrl %>" controls></video>
+            <% } else if (item.type === "audio") { %>
+              <audio src="<%= item.fileUrl %>" controls></audio>
+            <% } %>
           <% }) %>
         </div>
       </div>
     </section>
+
 
     <!-- Testimonios -->
     <section id="testimonials">

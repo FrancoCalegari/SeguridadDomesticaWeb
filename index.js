@@ -1,5 +1,5 @@
 // index.js
-
+const multer = require("multer");
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
@@ -17,25 +17,33 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 app.use(express.static(path.join(__dirname, "public")));
 
+// === Storage de archivos ===
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, "public", "uploads")); // carpeta donde se guardan
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + "-" + file.originalname;
+    cb(null, uniqueName);
+  }
+});
+const upload = multer({ storage });
+
+
 // Función genérica para leer JSON
+// === Helpers JSON ===
 function loadJSON(file) {
   try {
-    const data = fs.readFileSync(
-      path.join(__dirname, "public", "data", file), // 👈 siempre dentro de public/data
-      "utf-8"
-    );
+    const data = fs.readFileSync(path.join(__dirname, "public", "data", file), "utf-8");
     return JSON.parse(data);
   } catch (err) {
-    console.error(`Error leyendo ${file}:`, err);
+    console.error("Error leyendo", file, err);
     return [];
   }
 }
 
 function saveJSON(file, data) {
-  fs.writeFileSync(
-    path.join(__dirname, "public", "data", file), // 👈 también guardamos en public/data
-    JSON.stringify(data, null, 2)
-  );
+  fs.writeFileSync(path.join(__dirname, "public", "data", file), JSON.stringify(data, null, 2));
 }
 
 
@@ -151,32 +159,59 @@ app.post("/admin/testimonial/delete/:id", isAuth, (req, res) => {
 // ===============================
 // CRUD GALERIA
 // ===============================
-app.post("/admin/gallery/add", isAuth, (req, res) => {
+app.post("/admin/gallery/add", upload.single("file"), (req, res) => {
   let galeria = loadJSON("gallery.json");
-  const nuevo = {
+
+  const newItem = {
     id: Date.now(),
-    imageUrl: req.body.imageUrl,
-    description: req.body.description
+    description: req.body.description,
+    fileUrl: "/uploads/" + req.file.filename, // ruta pública
+    type: req.file.mimetype.startsWith("image")
+      ? "image"
+      : req.file.mimetype.startsWith("video")
+      ? "video"
+      : "audio"
   };
-  galeria.push(nuevo);
+
+  galeria.push(newItem);
+  saveJSON("gallery.json", galeria);
+
+  res.redirect("/admin");
+});
+
+
+// Editar item
+app.post("/admin/gallery/edit/:id", upload.single("file"), (req, res) => {
+  let galeria = loadJSON("gallery.json");
+  const id = parseInt(req.params.id);
+
+  galeria = galeria.map(g => {
+    if (g.id === id) {
+      g.description = req.body.description || g.description;
+
+      if (req.file) {
+        g.fileUrl = "/uploads/" + req.file.filename;
+        g.type = req.file.mimetype.startsWith("image")
+          ? "image"
+          : req.file.mimetype.startsWith("video")
+          ? "video"
+          : "audio";
+      }
+    }
+    return g;
+  });
+
   saveJSON("gallery.json", galeria);
   res.redirect("/admin");
 });
 
-app.post("/admin/gallery/edit/:id", isAuth, (req, res) => {
+// Eliminar item
+app.post("/admin/gallery/delete/:id", (req, res) => {
   let galeria = loadJSON("gallery.json");
-  galeria = galeria.map(g =>
-    g.id == req.params.id
-      ? { ...g, imageUrl: req.body.imageUrl, description: req.body.description }
-      : g
-  );
-  saveJSON("gallery.json", galeria);
-  res.redirect("/admin");
-});
+  const id = parseInt(req.params.id);
 
-app.post("/admin/gallery/delete/:id", isAuth, (req, res) => {
-  let galeria = loadJSON("gallery.json");
-  galeria = galeria.filter(g => g.id != req.params.id);
+  galeria = galeria.filter(g => g.id !== id);
+
   saveJSON("gallery.json", galeria);
   res.redirect("/admin");
 });
@@ -187,10 +222,17 @@ app.post("/admin/gallery/delete/:id", isAuth, (req, res) => {
 app.get("/", (req, res) => {
   const products = loadJSON("products.json");
   const services = loadJSON("services.json");
-  const testimonials = loadJSON("testimonials.json");
-  const galleryImages = loadJSON("gallery.json");
-  res.render("index", { title: "Inicio", products, services, testimonials, galleryImages });
+  const testimonios = loadJSON("testimonials.json");
+  const galeria = loadJSON("gallery.json");
+
+  res.render("index", {
+    products,
+    services,
+    testimonials: testimonios,
+    galeria
+  });
 });
+
 
 app.listen(PORT, () => {
   console.log(`Servidor escuchando en http://localhost:${PORT}`);
