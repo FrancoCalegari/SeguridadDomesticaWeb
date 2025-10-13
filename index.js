@@ -4,6 +4,7 @@ const express = require("express");
 const session = require("express-session");
 const path = require("path");
 const fs = require("fs");
+const nodemailer = require("nodemailer");
 
 const app = express();
 const PORT = 3000;
@@ -28,6 +29,39 @@ const storage = multer.diskStorage({
   }
 });
 const upload = multer({ storage });
+
+// Configurar transporter (ejemplo con Gmail)
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "jsautomatizacionesweb@gmail.com",       // reemplaza con tu email
+    pass: "hdeh wkea tcen mabo"   // si usas Gmail, generar App Password
+  }
+});
+
+app.post("/contact", (req, res) => {
+  const { name, email, message } = req.body;
+
+  const mailOptions = {
+    from: `"${name}" <${email}>`,
+    to: "portonautomatico13@gmail.com",
+    subject: `Nuevo mensaje de contacto de ${name}`,
+    text: message,
+    html: `<p><strong>Nombre:</strong> ${name}</p>
+           <p><strong>Email:</strong> ${email}</p>
+           <p><strong>Mensaje:</strong><br>${message}</p>`
+  };
+
+  transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      console.error("Error enviando correo:", err);
+      return res.status(500).json({ success: false, message: "Error enviando el mensaje" });
+    }
+    console.log("Correo enviado:", info.response);
+    res.json({ success: true, message: "Mensaje enviado correctamente" });
+  });
+});
+
 
 
 // Función genérica para leer JSON
