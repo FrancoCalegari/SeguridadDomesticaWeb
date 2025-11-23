@@ -184,6 +184,15 @@ const mapMimeToType = mimetype => {
   return "image";
 };
 
+const mapResourceToType = (resourceType, format = "") => {
+  if (resourceType === "image") return "image";
+  const lowerFormat = format.toLowerCase();
+  const audioFormats = ["mp3", "wav", "ogg", "aac", "m4a"];
+  if (resourceType === "video" && audioFormats.includes(lowerFormat)) return "audio";
+  if (resourceType === "video") return "video";
+  return "image";
+};
+
 const destroyCloudinaryAsset = async (publicId, type = "image") => {
   if (!publicId) return;
   const resourceType = type === "image" ? "image" : "video"; // audio se maneja como video en Cloudinary
@@ -301,6 +310,32 @@ app.get("/admin", isAuth, async (req, res) => {
 });
 
 // ===========================
+// Firmas para subida directa a Cloudinary
+// ===========================
+app.post("/admin/gallery/sign", isAuth, (req, res) => {
+  try {
+    const timestamp = Math.round(Date.now() / 1000);
+    const publicId = req.body?.publicId;
+    const paramsToSign = { timestamp, folder: CLOUDINARY_FOLDER };
+    if (publicId) paramsToSign.public_id = publicId;
+
+    const signature = cloudinary.utils.api_sign_request(paramsToSign, cloudinary.config().api_secret);
+
+    res.json({
+      success: true,
+      signature,
+      timestamp,
+      folder: CLOUDINARY_FOLDER,
+      cloudName: cloudinary.config().cloud_name,
+      apiKey: cloudinary.config().api_key
+    });
+  } catch (err) {
+    console.error("Error generando firma Cloudinary:", err);
+    res.status(500).json({ success: false, message: "No se pudo generar la firma" });
+  }
+});
+
+// ===========================
 // CRUD PRODUCTOS
 // ===========================
 app.post("/admin/add", isAuth, async (req, res) => {
@@ -383,6 +418,57 @@ app.post("/admin/testimonial/delete/:id", isAuth, async (req, res) => {
 // ===========================
 // CRUD GALERÍA
 // ===========================
+// Subida directa desde el cliente (Cloudinary) -> solo guarda en DB
+app.post("/admin/gallery/add-direct", isAuth, async (req, res) => {
+  try {
+    const { fileUrl, description, publicId, resourceType, format, type } = req.body || {};
+    if (!fileUrl || !publicId || !description) {
+      return res.status(400).json({ success: false, message: "fileUrl, publicId y description son requeridos" });
+    }
+    const finalType = type || mapResourceToType(resourceType, format);
+    const newItem = await GalleryItem.create({
+      fileUrl,
+      publicId,
+      description,
+      type: finalType
+    });
+    res.json({ success: true, message: "Archivo agregado correctamente", item: toPlain(newItem) });
+  } catch (err) {
+    console.error("Error creando ítem de galería:", err);
+    res.status(500).json({ success: false, message: "Error al crear ítem de galería" });
+  }
+});
+
+// Edición directa (cambia URL/Cloudinary ID opcionalmente)
+app.put("/admin/gallery/edit-direct/:id", isAuth, async (req, res) => {
+  try {
+    const { fileUrl, description, publicId, resourceType, format, type } = req.body || {};
+    const current = await GalleryItem.findById(req.params.id);
+    if (!current) return res.status(404).json({ success: false, message: "No encontrado" });
+
+    const update = {
+      description: description ?? current.description
+    };
+
+    if (fileUrl && publicId) {
+      update.fileUrl = fileUrl;
+      update.publicId = publicId;
+      update.type = type || mapResourceToType(resourceType, format);
+    }
+
+    const updated = await GalleryItem.findByIdAndUpdate(req.params.id, update, { new: true });
+
+    if (fileUrl && publicId && current.publicId && current.publicId !== publicId) {
+      await destroyCloudinaryAsset(current.publicId, current.type);
+    }
+
+    res.json({ success: true, message: "Archivo actualizado correctamente", item: toPlain(updated) });
+  } catch (err) {
+    console.error("Error editando archivo:", err);
+    res.status(500).json({ success: false, message: "Error al editar archivo" });
+  }
+});
+
 // POST - agregar archivo
 app.post("/admin/gallery/add", isAuth, upload.single("file"), async (req, res) => {
   try {

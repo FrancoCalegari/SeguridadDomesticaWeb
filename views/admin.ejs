@@ -262,6 +262,15 @@ function showMessage(msg) {
 const jsonHeaders = { "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest" };
 const ajaxHeaders = { "X-Requested-With": "XMLHttpRequest", Accept: "application/json" };
 
+const sanitizePublicId = name => `${Date.now()}-${name}`.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9._-]/g, "");
+const mapCloudinaryType = (resourceType, format = "") => {
+  if (resourceType === "image") return "image";
+  const audioFormats = ["mp3", "wav", "ogg", "aac", "m4a"];
+  if (resourceType === "video" && audioFormats.includes(format?.toLowerCase())) return "audio";
+  if (resourceType === "video") return "video";
+  return "image";
+};
+
 function openModal(tipo, id = null) {
   document.getElementById(`modal-${tipo}`).style.display = 'flex';
   document.getElementById(`form-${tipo}`).reset();
@@ -428,67 +437,109 @@ document.getElementById('form-galeria').addEventListener('submit', async e => {
   const galeriaFile = document.getElementById('galeria-file');
   const galeriaDescription = document.getElementById('galeria-description');
 
-  const formData = new FormData();
   const file = galeriaFile.files[0];
-  if (file) formData.append('file', file);
-  formData.append('description', galeriaDescription.value);
-
-  const url = id ? `/admin/gallery/edit/${id}` : '/admin/gallery/add';
-  const method = id ? 'PUT' : 'POST';
+  const description = galeriaDescription.value;
 
   // Mostrar popup de carga
   showPopup("Subiendo archivo...", "Por favor espera mientras se procesa el archivo.");
 
   try {
-    const xhr = new XMLHttpRequest();
-    xhr.open(method, url);
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    let uploadData = null;
 
-    xhr.upload.addEventListener("progress", e => {
-      if (e.lengthComputable) {
-        const percent = Math.round((e.loaded / e.total) * 100);
-        updateProgress(percent);
-      }
-    });
-
-    xhr.onload = () => {
-      if (xhr.status === 401) {
+    if (file) {
+      // 1) pedir firma
+      const publicId = sanitizePublicId(file.name);
+      const signRes = await fetch("/admin/gallery/sign", {
+        method: "POST",
+        headers: jsonHeaders,
+        body: JSON.stringify({ publicId })
+      });
+      if (signRes.status === 401) {
         showError("Sesión expirada. Vuelve a iniciar sesión.");
         window.location.href = "/login";
         return;
       }
+      if (!signRes.ok) throw new Error("No se pudo obtener firma de subida.");
 
-      const raw = xhr.responseText || "";
-      let data = null;
-      if (raw) {
-        try {
-          data = JSON.parse(raw);
-        } catch (parseErr) {
-          console.warn("Respuesta no JSON:", raw.slice(0, 200));
-        }
-      }
+      const signData = await signRes.json();
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${signData.cloudName}/auto/upload`;
+      const uploadForm = new FormData();
+      uploadForm.append("file", file);
+      uploadForm.append("api_key", signData.apiKey);
+      uploadForm.append("timestamp", signData.timestamp);
+      uploadForm.append("signature", signData.signature);
+      uploadForm.append("folder", signData.folder);
+      uploadForm.append("public_id", publicId);
 
-      if (xhr.status === 200) {
-        if (data?.success) {
-          showSuccess("Archivo subido correctamente.");
-          updateGaleria(); // refresca tabla
-          closeModal("galeria");
-        } else {
-          showError(data?.message || "Error desconocido.");
-        }
-      } else {
-        if (xhr.status === 413) {
-          showError("Archivo demasiado grande para el servidor. Comprime o reduce el peso.");
-          return;
-        }
-        const msg = data?.message || raw.slice(0, 200);
-        showError(msg || "Error del servidor (" + xhr.status + ")");
-      }
+      // 2) subir directo a Cloudinary con progreso
+      uploadData = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", uploadUrl);
+
+        xhr.upload.addEventListener("progress", e => {
+          if (e.lengthComputable) {
+            const percent = Math.round((e.loaded / e.total) * 100);
+            updateProgress(percent);
+          }
+        });
+
+        xhr.onload = () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch (err) {
+              reject(new Error("Respuesta inesperada de Cloudinary."));
+            }
+          } else {
+            reject(new Error("Error de Cloudinary (" + xhr.status + ")."));
+          }
+        };
+
+        xhr.onerror = () => reject(new Error("No se pudo conectar con Cloudinary."));
+
+        xhr.send(uploadForm);
+      });
+    }
+
+    if (!uploadData && !id) {
+      throw new Error("Selecciona un archivo para subir.");
+    }
+
+    const payload = {
+      description
     };
 
-    xhr.onerror = () => showError("No se pudo conectar con el servidor.");
+    if (uploadData) {
+      payload.fileUrl = uploadData.secure_url;
+      payload.publicId = uploadData.public_id;
+      payload.resourceType = uploadData.resource_type;
+      payload.format = uploadData.format;
+      payload.type = mapCloudinaryType(uploadData.resource_type, uploadData.format);
+    }
 
-    xhr.send(formData);
+    const saveUrl = id ? `/admin/gallery/edit-direct/${id}` : "/admin/gallery/add-direct";
+    const saveMethod = id ? "PUT" : "POST";
+
+    const saveRes = await fetch(saveUrl, {
+      method: saveMethod,
+      headers: jsonHeaders,
+      body: JSON.stringify(payload)
+    });
+
+    if (saveRes.status === 401) {
+      showError("Sesión expirada. Vuelve a iniciar sesión.");
+      window.location.href = "/login";
+      return;
+    }
+
+    const saveData = await saveRes.json().catch(() => ({}));
+    if (!saveRes.ok || !saveData?.success) {
+      throw new Error(saveData?.message || "Error al guardar en la base de datos.");
+    }
+
+    showSuccess("Archivo subido correctamente.");
+    updateGaleria(); // refresca tabla
+    closeModal("galeria");
   } catch (err) {
     console.error(err);
     showError("Error inesperado: " + err.message);
