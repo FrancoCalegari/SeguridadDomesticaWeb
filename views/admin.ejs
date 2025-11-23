@@ -442,7 +442,6 @@ document.getElementById('form-galeria').addEventListener('submit', async e => {
   try {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
-    xhr.responseType = "json";
     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
     xhr.upload.addEventListener("progress", e => {
@@ -459,18 +458,17 @@ document.getElementById('form-galeria').addEventListener('submit', async e => {
         return;
       }
 
-      if (xhr.status === 200) {
-        let data = xhr.response;
-        if (!data || typeof data !== "object") {
-          try {
-            data = JSON.parse(xhr.responseText);
-          } catch (parseErr) {
-            console.error("Respuesta no JSON:", xhr.responseText);
-            showError("Respuesta inesperada del servidor. Intenta nuevamente.");
-            return;
-          }
+      const raw = xhr.responseText || "";
+      let data = null;
+      if (raw) {
+        try {
+          data = JSON.parse(raw);
+        } catch (parseErr) {
+          console.warn("Respuesta no JSON:", raw.slice(0, 200));
         }
+      }
 
+      if (xhr.status === 200) {
         if (data?.success) {
           showSuccess("Archivo subido correctamente.");
           updateGaleria(); // refresca tabla
@@ -479,7 +477,11 @@ document.getElementById('form-galeria').addEventListener('submit', async e => {
           showError(data?.message || "Error desconocido.");
         }
       } else {
-        const msg = xhr.responseText ? xhr.responseText.slice(0, 200) : "";
+        if (xhr.status === 413) {
+          showError("Archivo demasiado grande para el servidor. Comprime o reduce el peso.");
+          return;
+        }
+        const msg = data?.message || raw.slice(0, 200);
         showError(msg || "Error del servidor (" + xhr.status + ")");
       }
     };
