@@ -3,6 +3,7 @@ require("dotenv").config();
 const multer = require("multer");
 const express = require("express");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
 const path = require("path");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
@@ -16,6 +17,7 @@ if (!MONGODB_URI) {
   console.error("MONGODB_URI no definida. Agrega la URI en tu .env.");
   process.exit(1);
 }
+const SESSION_SECRET = process.env.SESSION_SECRET || "mi-clave-secreta";
 const CLOUDINARY_FOLDER = process.env.CLOUDINARY_FOLDER || "seguridad_domestica";
 
 // Middleware para body
@@ -228,10 +230,24 @@ app.post("/contact", (req, res) => {
 // ===========================
 // Sesión y login
 // ===========================
+app.set("trust proxy", 1);
+const sessionStore = MongoStore.create({
+  mongoUrl: MONGODB_URI,
+  collectionName: "sessions",
+  ttl: 7 * 24 * 60 * 60 // 7 días
+});
+
 app.use(session({
-  secret: "mi-clave-secreta",
+  secret: SESSION_SECRET,
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  store: sessionStore,
+  cookie: {
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production"
+  }
 }));
 
 const isAjaxRequest = req =>
