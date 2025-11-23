@@ -234,8 +234,17 @@ app.use(session({
   saveUninitialized: false
 }));
 
+const isAjaxRequest = req =>
+  req.xhr ||
+  req.headers["x-requested-with"] === "XMLHttpRequest" ||
+  req.headers.accept?.includes("application/json") ||
+  req.headers["content-type"]?.includes("application/json");
+
 function isAuth(req, res, next) {
   if (req.session.user) return next();
+  if (isAjaxRequest(req)) {
+    return res.status(401).json({ success: false, message: "No autorizado" });
+  }
   res.redirect("/login");
 }
 

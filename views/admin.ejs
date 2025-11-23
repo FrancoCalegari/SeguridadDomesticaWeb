@@ -259,6 +259,9 @@ function showMessage(msg) {
   setTimeout(() => popup.classList.remove('show'), 2500);
 }
 
+const jsonHeaders = { "Content-Type": "application/json", "X-Requested-With": "XMLHttpRequest" };
+const ajaxHeaders = { "X-Requested-With": "XMLHttpRequest", Accept: "application/json" };
+
 function openModal(tipo, id = null) {
   document.getElementById(`modal-${tipo}`).style.display = 'flex';
   document.getElementById(`form-${tipo}`).reset();
@@ -297,7 +300,7 @@ document.getElementById('form-producto').addEventListener('submit', async e => {
   const url = id ? `/admin/edit/${id}` : '/admin/add';
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonHeaders,
     body: JSON.stringify(data)
   });
 
@@ -312,7 +315,7 @@ document.getElementById('form-producto').addEventListener('submit', async e => {
 });
 
 async function updateProductos() {
-  const res = await fetch('/admin/products/list');
+  const res = await fetch('/admin/products/list', { headers: ajaxHeaders });
   const productos = await res.json();
   const tbody = document.querySelector('#tabla-productos tbody');
   tbody.innerHTML = '';
@@ -340,7 +343,7 @@ function editProducto(p) {
 
 async function deleteProducto(id) {
   if (!confirm('¿Eliminar producto?')) return;
-  const res = await fetch(`/admin/delete/${id}`, { method: 'POST' });
+  const res = await fetch(`/admin/delete/${id}`, { method: 'POST', headers: ajaxHeaders });
   if (res.ok) {
     showMessage('Producto eliminado');
     updateProductos();
@@ -366,7 +369,7 @@ document.getElementById('form-testimonio').addEventListener('submit', async e =>
   const url = id ? `/admin/testimonial/edit/${id}` : '/admin/testimonial/add';
   const res = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: jsonHeaders,
     body: JSON.stringify(data)
   });
 
@@ -380,7 +383,7 @@ document.getElementById('form-testimonio').addEventListener('submit', async e =>
 });
 
 async function updateTestimonios() {
-  const res = await fetch('/admin/testimonials/list');
+  const res = await fetch('/admin/testimonials/list', { headers: ajaxHeaders });
   const testimonios = await res.json();
   const tbody = document.querySelector('#tabla-testimonios tbody');
   tbody.innerHTML = '';
@@ -406,7 +409,7 @@ function editTestimonio(t) {
 
 async function deleteTestimonio(id) {
   if (!confirm('¿Eliminar testimonio?')) return;
-  const res = await fetch(`/admin/testimonial/delete/${id}`, { method: 'POST' });
+  const res = await fetch(`/admin/testimonial/delete/${id}`, { method: 'POST', headers: ajaxHeaders });
   if (res.ok) {
     showMessage('Testimonio eliminado');
     updateTestimonios();
@@ -439,6 +442,8 @@ document.getElementById('form-galeria').addEventListener('submit', async e => {
   try {
     const xhr = new XMLHttpRequest();
     xhr.open(method, url);
+    xhr.responseType = "json";
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 
     xhr.upload.addEventListener("progress", e => {
       if (e.lengthComputable) {
@@ -448,17 +453,34 @@ document.getElementById('form-galeria').addEventListener('submit', async e => {
     });
 
     xhr.onload = () => {
+      if (xhr.status === 401) {
+        showError("Sesión expirada. Vuelve a iniciar sesión.");
+        window.location.href = "/login";
+        return;
+      }
+
       if (xhr.status === 200) {
-        const data = JSON.parse(xhr.responseText);
-        if (data.success) {
+        let data = xhr.response;
+        if (!data || typeof data !== "object") {
+          try {
+            data = JSON.parse(xhr.responseText);
+          } catch (parseErr) {
+            console.error("Respuesta no JSON:", xhr.responseText);
+            showError("Respuesta inesperada del servidor. Intenta nuevamente.");
+            return;
+          }
+        }
+
+        if (data?.success) {
           showSuccess("Archivo subido correctamente.");
           updateGaleria(); // refresca tabla
           closeModal("galeria");
         } else {
-          showError(data.message || "Error desconocido.");
+          showError(data?.message || "Error desconocido.");
         }
       } else {
-        showError("Error del servidor (" + xhr.status + ")");
+        const msg = xhr.responseText ? xhr.responseText.slice(0, 200) : "";
+        showError(msg || "Error del servidor (" + xhr.status + ")");
       }
     };
 
@@ -473,7 +495,7 @@ document.getElementById('form-galeria').addEventListener('submit', async e => {
 
 
 async function updateGaleria() {
-  const res = await fetch('/admin/gallery/list');
+  const res = await fetch('/admin/gallery/list', { headers: ajaxHeaders });
   const galeria = await res.json();
   const tbody = document.querySelector('#tabla-galeria tbody');
   tbody.innerHTML = '';
@@ -502,7 +524,7 @@ function editGaleria(g) {
 
 async function deleteGaleria(id) {
   if (!confirm('¿Eliminar archivo?')) return;
-  const res = await fetch(`/admin/gallery/delete/${id}`, { method: 'POST' });
+  const res = await fetch(`/admin/gallery/delete/${id}`, { method: 'POST', headers: ajaxHeaders });
   if (res.ok) {
     showMessage('Archivo eliminado');
     updateGaleria();
