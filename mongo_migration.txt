@@ -1,0 +1,68 @@
+Migracion a MongoDB y opciones de almacenamiento
+===============================================
+
+1) Preparar conexion
+- URI de Atlas cargada en el codigo (valor por defecto si no defines MONGODB_URI):
+  mongodb+srv://vercelAlfredTest:137546321a%40@cluster0.agnkord.mongodb.net/seguridad_domestica?retryWrites=true&w=majority&appName=Cluster0
+- El servidor usa MONGODB_URI si esta definida; de lo contrario, usa la cadena anterior.
+
+2) Importar los JSON actuales (public/data/*.json) con mongoimport
+- Los modelos usan las colecciones: products, testimonials, galleryitems y services.
+- Usando Atlas ya configurado (se importo asi):
+  URI='mongodb+srv://vercelAlfredTest:137546321a%40@cluster0.agnkord.mongodb.net/seguridad_domestica?retryWrites=true&w=majority&appName=Cluster0'
+  mongoimport --uri "$URI" --collection products --db seguridad_domestica --file public/data/products.json --jsonArray
+  mongoimport --uri "$URI" --collection testimonials --db seguridad_domestica --file public/data/testimonials.json --jsonArray
+  mongoimport --uri "$URI" --collection galleryitems --db seguridad_domestica --file public/data/gallery.json --jsonArray
+  mongoimport --uri "$URI" --collection services --db seguridad_domestica --file public/data/services.json --jsonArray
+- Resultado realizado: 5 products, 4 testimonials, 3 galleryitems, 3 services importados en Atlas.
+- Los documentos pueden conservar el campo "id" antiguo, pero la app usa _id generado por Mongo. Si quieres limpiar, elimina la clave "id" antes de importar.
+
+3) Script de Python (opcional) para importar
+- Requiere: pip install pymongo
+- Guarda algo similar en import_to_mongo.py y ejecitalo con: python import_to_mongo.py
+
+from pathlib import Path
+import json
+from pymongo import MongoClient
+
+URI = "mongodb://127.0.0.1:27017/seguridad_domestica"  # o tu cadena de Atlas
+DATA_DIR = Path("public/data")
+
+client = MongoClient(URI)
+db = client.get_default_database()
+
+def load_file(filename, collection):
+    data_path = DATA_DIR / filename
+    if not data_path.exists():
+        print(f"No existe {data_path}, se omite.")
+        return
+    docs = json.loads(data_path.read_text(encoding="utf-8"))
+    for doc in docs:
+        doc.pop("id", None)  # limpiamos el id previo
+    if docs:
+        db[collection].insert_many(docs)
+        print(f"Insertados {len(docs)} docs en {collection}")
+
+load_file("products.json", "products")
+load_file("testimonials.json", "testimonials")
+load_file("gallery.json", "galleryitems")
+load_file("services.json", "services")
+
+print("Importacion terminada.")
+
+4) Donde alojar los archivos subidos (actualmente se guardan en public/uploads)
+- Opcion S3/R2/B2 (compatible con API S3): crea un bucket y reemplaza multer.diskStorage por un almacenamiento tipo S3 (paquetes utiles: @aws-sdk/client-s3 + multer-s3). Guarda en la base el URL publico o un path servido por CloudFront/Cloudflare.
+- Opcion Cloudinary: buena para imagenes y video ligero; usa multer-storage-cloudinary y guarda el secure_url en fileUrl.
+- Opcion Firebase Storage o Supabase Storage: SDK sencillo en Node, URLs firmadas y CDN incluidos.
+- Con cualquiera: elimina el fileUrl local y guarda la URL remota. Si migras los archivos existentes, subelos al bucket y actualiza fileUrl en Mongo para que apunte a la URL publica o firmada.
+
+5) Cloudinary (implementado)
+- Variables necesarias: CLOUDINARY_URL (o CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET) y opcional CLOUDINARY_FOLDER (default: seguridad_domestica).
+- El backend ya usa Cloudinary para todas las nuevas subidas (multer-storage-cloudinary). Se almacena secure_url en fileUrl y publicId para eliminar/editar.
+
+6) Migrar archivos locales de uploads a Cloudinary y actualizar Atlas
+- Script: scripts/migrate_uploads_to_cloudinary.js
+- Requiere que existan CLOUDINARY_URL (o CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET) y MONGODB_URI.
+- Ejecuta: npm run migrate:uploads
+- El script busca en la coleccion galleryitems entradas sin publicId o con fileUrl empezando en /uploads/, sube el archivo local a Cloudinary, y actualiza fileUrl/publicId en Atlas.
+- Si un archivo local no existe, se registra un warning y se omite. No elimina los archivos locales.

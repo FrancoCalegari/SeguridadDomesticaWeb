@@ -1,467 +1,356 @@
 /* =========================
-   Admin Dashboard Styles
+   ADMIN DASHBOARD (modular)
 ========================= */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: "Inter", Arial, sans-serif;
   background: #f4f6f9;
   color: #333;
   margin: 0;
   padding: 20px;
 }
 
-h1, h3 {
+h1 {
   text-align: center;
-  color: #224369;
+  color: #1e3a5f;
+  margin-bottom: 40px;
 }
 
-/* ---- Agregar Producto ---- */
-.addProductDiv {
-  max-width: 600px;
-  margin: 20px auto;
+section {
   background: #fff;
   padding: 25px;
+  margin: 30px auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  max-width: 1200px;
+}
+
+h2 {
+  color: #224369;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #224369;
+  padding-bottom: 8px;
+}
+
+/* ---- Botones principales ---- */
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.add-btn {
+  background: #224369;
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.add-btn:hover {
+  background: #1a3350;
+}
+
+.edit-btn {
+  background: #e79b21;
+  color: #fff;
+}
+
+.edit-btn:hover {
+  background: #c97e15;
+}
+
+.del-btn {
+  background: #c62828;
+  color: #fff;
+}
+
+.del-btn:hover {
+  background: #a81e1e;
+}
+
+/* ---- Tablas ---- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-.addProductDiv h1 {
-  margin-bottom: 20px;
+th, td {
+  padding: 12px 10px;
+  text-align: center;
+  border-bottom: 1px solid #e1e1e1;
+  vertical-align: middle;
 }
 
-.addProductDiv form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+th {
+  background: #224369;
+  color: #fff;
+  font-weight: bold;
 }
 
-.addProductDiv input {
-  padding: 12px;
-  border: 1px solid #ccc;
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #eef3f9;
+}
+
+img, video, audio {
   border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ---- Modal ---- */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  justify-content: center;
+  align-items: center;
+  z-index: 49;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  position: relative;
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+  color: #224369;
+  text-align: center;
+}
+
+.modal-content input, 
+.modal-content textarea, 
+.modal-content select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
   font-size: 1rem;
   transition: border 0.3s;
 }
 
-.addProductDiv input:focus {
+.modal-content input:focus,
+.modal-content textarea:focus {
   border-color: #224369;
   outline: none;
 }
 
-.addProductDiv button {
-  padding: 12px;
+.modal-content button[type="submit"] {
+  width: 100%;
   background: #224369;
   color: #fff;
+  padding: 12px;
   font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
+  border-radius: 8px;
 }
 
-.addProductDiv button:hover {
+.modal-content button[type="submit"]:hover {
   background: #1a3350;
 }
 
-/* ---- Vista Productos ---- */
-.productView {
-  margin-top: 50px;
-  background: #fff;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.productView h3 {
-  margin-bottom: 20px;
-}
-
-.productView table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.productView th, .productView td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.productView th {
-  background: #224369;
-  color: #fff;
-}
-
-.productView tr:nth-child(even) {
-  background: #f9f9f9;
-}
-
-.productView tr:hover {
-  background: #eef3f9;
-}
-
-/* ---- Inputs en tabla ---- */
-.productView input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 90%;
-  font-size: 0.9rem;
-}
-
-.productView button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
+.close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
   cursor: pointer;
-  font-weight: bold;
+  font-size: 1.2rem;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.close:hover {
+  color: #000;
+}
+
+/* ---- Popup Mensaje ---- */
+.popup-message {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #333;
   color: #fff;
-  transition: background 0.3s;
+  padding: 12px 20px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.4s;
+  z-index: 50;
 }
 
-.productView form[method="post"] button[type="submit"] {
-  background: #e79b21;
+.popup-message.show {
+  opacity: 1;
 }
-
-.productView form[method="post"] button[type="submit"]:hover {
-  background: #c97e15;
-}
-
-.productView form[action*="delete"] button {
-  background: #c62828;
-}
-
-.productView form[action*="delete"] button:hover {
-  background: #a81e1e;
-}
-
 
 /* =========================
-   Responsive Admin Dashboard
+   Responsive
 ========================= */
 @media (max-width: 992px) {
-  .addProductDiv, .productView {
+  section {
+    margin: 20px;
     padding: 20px;
-    margin: 15px;
   }
-
-  .addProductDiv form, .productView input {
-    width: 100%;
-  }
-
-  .productView table, .productView th, .productView td {
-    font-size: 0.85rem;
-    padding: 8px;
-  }
-
-  .productView img {
-    width: 80px;
+  th, td {
+    padding: 10px 6px;
+    font-size: 0.95rem;
   }
 }
 
 @media (max-width: 768px) {
-  body {
-    padding: 15px;
-  }
-
-  .addProductDiv, .productView {
-    padding: 15px;
-    margin: 10px;
-  }
-
-  .addProductDiv h1, .productView h3 {
-    font-size: 1.5rem;
-  }
-
-  .productView table, .productView th, .productView td {
+  table, thead, tbody, th, td, tr {
     display: block;
-    width: 100%;
   }
 
-  .productView th {
-    text-align: left;
+  th {
+    display: none;
   }
 
-  .productView td {
+  td {
     text-align: left;
-    padding: 8px 0;
     border: none;
     border-bottom: 1px solid #ddd;
+    position: relative;
+    padding-left: 50%;
   }
 
-  .productView tr {
+  td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+    color: #224369;
+  }
+
+  tr {
     margin-bottom: 15px;
-    display: block;
-    border-bottom: 2px solid #f0f0f0;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
 
-  .productView form input {
+  img, video {
     width: 100%;
-    margin-bottom: 8px;
+    max-width: 200px;
   }
 
-  .productView img {
-    width: 100%;
-    max-width: 150px;
-    display: block;
-    margin: 5px 0;
-  }
-
-  .productView button {
-    width: 100%;
-    margin-top: 5px;
+  .modal-content {
+    width: 90%;
   }
 }
 
-@media (max-width: 480px) {
-  .addProductDiv h1 {
-    font-size: 1.3rem;
-  }
 
-  .productView h3 {
-    font-size: 1.2rem;
-  }
+/* ===============================
+   Estilos del popup de subida
+   =============================== */
 
-  .addProductDiv input, .addProductDiv button {
-    font-size: 0.9rem;
-    padding: 10px;
-  }
-
-  .productView input, .productView button {
-    font-size: 0.85rem;
-    padding: 8px;
-  }
+#upload-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none; /* Oculto por defecto */
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  transition: opacity 0.3s ease;
 }
 
-/* ---- Agregar Testimonio ---- */
-.addTestimonialDiv {
-  max-width: 600px;
-  margin: 40px auto 20px auto;
-  background: #fff;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.addTestimonialDiv h1 {
-  margin-bottom: 20px;
-}
-
-.addTestimonialDiv form {
+#upload-popup.active {
   display: flex;
-  flex-direction: column;
-  gap: 15px;
+  opacity: 1;
 }
 
-.addTestimonialDiv input {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-.addTestimonialDiv button {
-  padding: 12px;
-  background: #224369;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.addTestimonialDiv button:hover {
-  background: #1a3350;
-}
-
-/* ---- Vista Testimonios ---- */
-.testimonialView {
-  margin-top: 40px;
+/* Contenedor principal */
+.upload-popup-content {
   background: #fff;
-  padding: 25px;
   border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.testimonialView h3 {
-  margin-bottom: 20px;
-}
-
-.testimonialView table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.testimonialView th, .testimonialView td {
-  border: 1px solid #ddd;
-  padding: 12px;
+  padding: 1.5rem;
+  width: 320px;
+  max-width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   text-align: center;
+  animation: fadeInScale 0.3s ease;
 }
 
-.testimonialView th {
-  background: #224369;
-  color: #fff;
+/* Título */
+.upload-popup-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #222;
 }
 
-.testimonialView tr:nth-child(even) {
-  background: #f9f9f9;
+/* Mensaje */
+.upload-popup-menssage {
+  font-size: 0.95rem;
+  color: #555;
+  margin-bottom: 1rem;
 }
 
-.testimonialView tr:hover {
-  background: #eef3f9;
-}
-
-.testimonialView input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 90%;
-}
-
-.testimonialView button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  color: #fff;
-  transition: background 0.3s;
-}
-
-.testimonialView form[action*="edit"] button {
-  background: #e79b21;
-}
-
-.testimonialView form[action*="edit"] button:hover {
-  background: #c97e15;
-}
-
-.testimonialView form[action*="delete"] button {
-  background: #c62828;
-}
-
-.testimonialView form[action*="delete"] button:hover {
-  background: #a81e1e;
-}
-
-/* ---- Agregar Imagen Galería ---- */
-.addGalleryDiv {
-  max-width: 600px;
-  margin: 40px auto 20px auto;
-  background: #fff;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.addGalleryDiv h1 {
-  margin-bottom: 20px;
-}
-
-.addGalleryDiv form {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.addGalleryDiv input {
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1rem;
-}
-
-.addGalleryDiv button {
-  padding: 12px;
-  background: #224369;
-  color: #fff;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.addGalleryDiv button:hover {
-  background: #1a3350;
-}
-
-/* ---- Vista Galería ---- */
-.galleryView {
-  margin-top: 40px;
-  background: #fff;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.galleryView h3 {
-  margin-bottom: 20px;
-}
-
-.galleryView table {
+/* Barra de progreso */
+.upload-popup-progress {
   width: 100%;
-  border-collapse: collapse;
+  background: #e5e7eb;
+  border-radius: 9999px;
+  height: 8px;
+  overflow: hidden;
+  margin-bottom: 1rem;
 }
 
-.galleryView th, .galleryView td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: center;
+.upload-popup-bar {
+  height: 100%;
+  background: #2563eb;
+  width: 0%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
 }
 
-.galleryView th {
-  background: #224369;
+/* Botón de cierre */
+.upload-popup-btn-close {
+  display: none;
+  background: #2563eb;
   color: #fff;
-}
-
-.galleryView tr:nth-child(even) {
-  background: #f9f9f9;
-}
-
-.galleryView tr:hover {
-  background: #eef3f9;
-}
-
-.galleryView input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 90%;
-}
-
-.galleryView img {
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-}
-
-.galleryView button {
-  padding: 8px 12px;
+  padding: 0.5rem 1rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-weight: bold;
-  color: #fff;
-  transition: background 0.3s;
+  font-size: 0.9rem;
+  transition: background 0.2s ease;
 }
 
-.galleryView form[action*="edit"] button {
-  background: #e79b21;
+.upload-popup-btn-close:hover {
+  background: #1e40af;
 }
 
-.galleryView form[action*="edit"] button:hover {
-  background: #c97e15;
+/* Mostrar botón cuando termine la carga */
+#upload-popup.success .upload-popup-btn-close {
+  display: inline-block;
 }
 
-.galleryView form[action*="delete"] button {
-  background: #c62828;
+/* Animación de entrada */
+@keyframes fadeInScale {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.galleryView form[action*="delete"] button:hover {
-  background: #a81e1e;
-}
