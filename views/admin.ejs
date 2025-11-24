@@ -35,11 +35,11 @@
       <tbody>
         <% productos.forEach(p => { %>
           <tr>
-            <td><%= p.id %></td>
-            <td><%= p.name %></td>
-            <td><%= p.description %></td>
-            <td><img src="<%= p.imageUrl %>" width="80"></td>
-            <td>
+            <td data-label="ID"><%= p.id %></td>
+            <td data-label="Nombre"><%= p.name %></td>
+            <td data-label="Descripción"><%= p.description %></td>
+            <td data-label="Imagen"><img src="<%= p.imageUrl %>" width="80"></td>
+            <td data-label="Acciones">
               <button class="edit-btn" onclick='editProducto(<%= JSON.stringify(p) %>)'>Editar</button>
               <button class="del-btn" onclick='deleteProducto("<%= p.id %>")'>Eliminar</button>
             </td>
@@ -77,10 +77,10 @@
       <tbody>
         <% testimonios.forEach(t => { %>
           <tr>
-            <td><%= t.id %></td>
-            <td><%= t.name %></td>
-            <td><%= t.quote %></td>
-            <td>
+            <td data-label="ID"><%= t.id %></td>
+            <td data-label="Nombre"><%= t.name %></td>
+            <td data-label="Cita"><%= t.quote %></td>
+            <td data-label="Acciones">
               <button class="edit-btn" onclick='editTestimonio(<%= JSON.stringify(t) %>)'>Editar</button>
               <button class="del-btn" onclick='deleteTestimonio("<%= t.id %>")'>Eliminar</button>
             </td>
@@ -117,8 +117,8 @@
       <tbody>
         <% galeria.forEach(g => { %>
           <tr>
-            <td><%= g.id %></td>
-            <td>
+            <td data-label="ID"><%= g.id %></td>
+            <td data-label="Archivo">
               <% if (g.type === "image") { %>
                 <img src="<%= g.fileUrl %>" width="100">
               <% } else if (g.type === "video") { %>
@@ -127,8 +127,8 @@
                 <audio src="<%= g.fileUrl %>" controls></audio>
               <% } %>
             </td>
-            <td><%= g.description %></td>
-            <td>
+            <td data-label="Descripción"><%= g.description %></td>
+            <td data-label="Acciones">
               <button class="edit-btn" onclick='editGaleria(<%= JSON.stringify(g) %>)'>Editar</button>
               <button class="del-btn" onclick='deleteGaleria("<%= g.id %>")'>Eliminar</button>
             </td>
@@ -331,11 +331,11 @@ async function updateProductos() {
   productos.forEach(p => {
     tbody.innerHTML += `
       <tr>
-        <td>${p.id}</td>
-        <td>${p.name}</td>
-        <td>${p.description}</td>
-        <td><img src="${p.imageUrl}" width="80"></td>
-        <td>
+        <td data-label="ID">${p.id}</td>
+        <td data-label="Nombre">${p.name}</td>
+        <td data-label="Descripción">${p.description}</td>
+        <td data-label="Imagen"><img src="${p.imageUrl}" width="80"></td>
+        <td data-label="Acciones">
           <button class="edit-btn" onclick='editProducto(${JSON.stringify(p)})'>Editar</button>
           <button class="del-btn" onclick='deleteProducto("${p.id}")'>Eliminar</button>
         </td>
@@ -399,10 +399,10 @@ async function updateTestimonios() {
   testimonios.forEach(t => {
     tbody.innerHTML += `
       <tr>
-        <td>${t.id}</td>
-        <td>${t.name}</td>
-        <td>${t.quote}</td>
-        <td>
+        <td data-label="ID">${t.id}</td>
+        <td data-label="Nombre">${t.name}</td>
+        <td data-label="Cita">${t.quote}</td>
+        <td data-label="Acciones">
           <button class="edit-btn" onclick='editTestimonio(${JSON.stringify(t)})'>Editar</button>
           <button class="del-btn" onclick='deleteTestimonio("${t.id}")'>Eliminar</button>
         </td>
@@ -551,23 +551,23 @@ async function updateGaleria() {
   const res = await fetch('/admin/gallery/list', { headers: ajaxHeaders });
   const galeria = await res.json();
   const tbody = document.querySelector('#tabla-galeria tbody');
-  tbody.innerHTML = '';
-  galeria.forEach(g => {
+  tbody.innerHTML = galeria.map(g => {
     let media = '';
     if (g.type === 'image') media = `<img src="${g.fileUrl}" width="100">`;
     else if (g.type === 'video') media = `<video src="${g.fileUrl}" width="200" controls autoplay muted playsinline preload="auto"></video>`;
     else media = `<audio src="${g.fileUrl}" controls></audio>`;
-    tbody.innerHTML += `
+    return `
       <tr>
-        <td>${g.id}</td>
-        <td>${media}</td>
-        <td>${g.description}</td>
-        <td>
+        <td data-label="ID">${g.id}</td>
+        <td data-label="Archivo">${media}</td>
+        <td data-label="Descripción">${g.description}</td>
+        <td data-label="Acciones">
           <button class="edit-btn" onclick='editGaleria(${JSON.stringify(g)})'>Editar</button>
           <button class="del-btn" onclick='deleteGaleria("${g.id}")'>Eliminar</button>
         </td>
       </tr>`;
-  });
+  }).join("");
+  initCloudinaryPlayers();
 }
 
 function editGaleria(g) {
