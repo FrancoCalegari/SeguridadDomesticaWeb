@@ -122,7 +122,7 @@
               <% if (g.type === "image") { %>
                 <img src="<%= g.fileUrl %>" width="100">
               <% } else if (g.type === "video") { %>
-                <video src="<%= g.fileUrl %>" width="200" controls></video>
+                <video src="<%= g.fileUrl %>" width="200" controls autoplay muted playsinline preload="auto"></video>
               <% } else if (g.type === "audio") { %>
                 <audio src="<%= g.fileUrl %>" controls></audio>
               <% } %>
@@ -555,7 +555,7 @@ async function updateGaleria() {
   galeria.forEach(g => {
     let media = '';
     if (g.type === 'image') media = `<img src="${g.fileUrl}" width="100">`;
-    else if (g.type === 'video') media = `<video src="${g.fileUrl}" width="200" controls></video>`;
+    else if (g.type === 'video') media = `<video src="${g.fileUrl}" width="200" controls autoplay muted playsinline preload="auto"></video>`;
     else media = `<audio src="${g.fileUrl}" controls></audio>`;
     tbody.innerHTML += `
       <tr>

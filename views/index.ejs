@@ -107,7 +107,7 @@
             <% if (item.type === "image") { %>
               <img src="<%= item.fileUrl %>" alt="<%= item.description %>">
             <% } else if (item.type === "video") { %>
-              <video src="<%= item.fileUrl %>" controls></video>
+              <video src="<%= item.fileUrl %>" controls autoplay muted playsinline preload="auto"></video>
             <% } else if (item.type === "audio") { %>
               <audio src="<%= item.fileUrl %>" controls></audio>
             <% } %>
