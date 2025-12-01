@@ -15,6 +15,18 @@
 		></script>
 	</head>
 	<body>
+    <!-- Navbar -->
+    <nav class="admin-navbar">
+      <div class="nav-brand">Admin Panel</div>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span class="hamburger"></span>
+      </button>
+      <div class="nav-links" id="nav-links">
+        <a href="/" target="_blank" class="nav-link">Ver Home</a>
+        <a href="/logout" class="nav-link logout-btn">Cerrar Sesión</a>
+      </div>
+    </nav>
+
 		<div id="upload-popup">
 			<div class="upload-popup-content">
 				<h3 id="popup-title" class="upload-popup-text">Subiendo archivo...</h3>
@@ -28,6 +40,7 @@
 			</div>
 		</div>
 
+    <div class="main-content">
 		<h1>Panel de Administración</h1>
 
 		<!-- =================== -->
@@ -813,6 +826,18 @@
 					showMessage("Error al eliminar archivo");
 				}
 			}
+
+			// =========================
+			// NAVBAR TOGGLE
+			// =========================
+      const navToggle = document.getElementById('nav-toggle');
+      const navLinks = document.getElementById('nav-links');
+
+      if(navToggle) {
+        navToggle.addEventListener('click', () => {
+          navLinks.classList.toggle('active');
+        });
+      }
 
 			// =========================
 			// ACTUALIZAR TODO AL INICIO
