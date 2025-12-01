@@ -109,6 +109,14 @@ img, video, audio {
   border-radius: 6px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
+.cld-iframe {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
 
 /* ---- Modal ---- */
 .modal {
