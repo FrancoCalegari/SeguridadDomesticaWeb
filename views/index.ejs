@@ -57,8 +57,10 @@
 				</button>
 
 				<nav id="navbar">
+					<% if (pagoActivo) { %>
 					<a href="#products">Productos</a>
 					<a href="#testimonials">Testimonios</a>
+					<% } %>
 					<a href="#contact">Contacto</a>
 				</nav>
 			</header>
@@ -102,7 +104,7 @@
 							Soluciones profesionales para la seguridad de tu hogar y empresa.
 						</p>
 						<div class="services-grid">
-							<% services.forEach(service => { %>
+							<% (services || []).forEach(service => { %>
 							<div class="card">
 								<img
 									src="<%= service.imageUrl %>"
@@ -118,6 +120,8 @@
 					</div>
 				</section>
 
+				<%# Secciones: Productos destacados, Instalaciones recientes y Testimonios condicionados por pagoActivo %>
+				<% if (pagoActivo) { %>
 				<!-- Productos -->
 				<section id="products">
 					<div class="container text-center">
@@ -126,7 +130,7 @@
 							Equipos y dispositivos de última tecnología para tu seguridad.
 						</p>
 						<div class="products-grid">
-							<% products.forEach(product => { %>
+							<% (products || []).forEach(product => { %>
 							<div class="card">
 								<img
 									src="<%= product.imageUrl %>"
@@ -146,7 +150,7 @@
 					<div class="container text-center">
 						<h2>Instalaciones Recientes</h2>
 						<div class="gallery-grid">
-							<% galeria.forEach((item, index) => { %> <% if (item.type ===
+							<% (galeria || []).forEach((item, index) => { %> <% if (item.type ===
 							"image") { %>
 							<img src="<%= item.fileUrl %>" alt="<%= item.description %>" />
 							<% } else if (item.type === "video") { %>
@@ -170,7 +174,7 @@
 					<div class="container text-center">
 						<h2>Lo que dicen nuestros clientes</h2>
 						<div class="testimonials-grid">
-							<% testimonials.forEach(testimonial => { %>
+							<% (testimonials || []).forEach(testimonial => { %>
 							<div class="card testimonial">
 								<div class="p-4">
 									<p>"<%= testimonial.quote %>"</p>
@@ -181,6 +185,7 @@
 						</div>
 					</div>
 				</section>
+				<% } %>
 
 				<!-- Contacto -->
 				<section id="contact">
@@ -202,6 +207,7 @@
 						</div>
 
 						<form id="contactForm" class="card p-4">
+							<% if (pagoActivo) { %>
 							<input type="text" name="name" placeholder="Nombre" required />
 							<input type="email" name="email" placeholder="Correo" required />
 							<textarea
@@ -211,6 +217,18 @@
 								required
 							></textarea>
 							<button type="submit" class="btn btn-accent">Enviar</button>
+							<% } else { %>
+							<input type="text" placeholder="Nombre" disabled />
+							<input type="email" placeholder="Correo" disabled />
+							<textarea
+								placeholder="El formulario de contacto se encuentra deshabilitado temporalmente."
+								rows="5"
+								disabled
+							></textarea>
+							<button type="button" class="btn btn-accent" disabled style="opacity: 0.5; cursor: not-allowed;">
+								No disponible
+							</button>
+							<% } %>
 						</form>
 					</div>
 				</section>

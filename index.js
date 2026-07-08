@@ -5,6 +5,7 @@ const express = require("express");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const path = require("path");
+const fs = require("fs");
 const nodemailer = require("nodemailer");
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
@@ -110,6 +111,27 @@ const toPlain = (doc) => {
 };
 
 const manyToPlain = (docs) => docs.map(toPlain);
+
+const readJsonFromDataFolder = (name) => {
+	const possiblePaths = [
+		path.join(__dirname, "data", `${name}.json`),
+		path.join(__dirname, "data", `.${name}.json`),
+		path.join(__dirname, "public", "data", `${name}.json`),
+		path.join(__dirname, "public", "data", `.${name}.json`),
+	];
+	for (const filePath of possiblePaths) {
+		try {
+			if (fs.existsSync(filePath)) {
+				const raw = fs.readFileSync(filePath, "utf-8");
+				const parsed = JSON.parse(raw);
+				if (Array.isArray(parsed)) return parsed;
+			}
+		} catch (e) {
+			console.warn(`Error leyendo archivo de data ${filePath}:`, e.message);
+		}
+	}
+	return null;
+};
 
 // ===========================
 // Configuración de subida (Cloudinary)
@@ -232,6 +254,11 @@ const destroyCloudinaryAsset = async (publicId, type = "image") => {
 // ===========================
 // Email contacto
 // ===========================
+const isPagoActivo = () => {
+	const val = String(process.env.pago || process.env.PAGO || "").trim().toLowerCase();
+	return val === "true";
+};
+
 const transporter = nodemailer.createTransport({
 	service: "gmail",
 	auth: {
@@ -241,6 +268,12 @@ const transporter = nodemailer.createTransport({
 });
 
 app.post("/contact", (req, res) => {
+	if (!isPagoActivo()) {
+		return res.status(403).json({
+			success: false,
+			message: "El formulario de contacto se encuentra deshabilitado en este momento.",
+		});
+	}
 	const { name, email, message } = req.body;
 
 	const mailOptions = {
@@ -651,25 +684,49 @@ app.post("/admin/gallery/delete/:id", isAuth, async (req, res) => {
 // Página principal
 // ===========================
 app.get("/", async (req, res) => {
-	try {
-		const [services, products, testimonios, galeria] = await Promise.all([
-			Service.find(),
-			Product.find(),
-			Testimonial.find(),
-			GalleryItem.find(),
-		]);
+	let services = [];
+	let products = [];
+	let testimonials = [];
+	let galeria = [];
 
-		res.render("index", {
-			services: manyToPlain(services),
-			products: manyToPlain(products),
-			testimonials: manyToPlain(testimonios),
-			galeria: manyToPlain(galeria),
-			cloudName: getCloudName(),
-		});
+	try {
+		const [dbServices, dbProducts, dbTestimonials, dbGallery] =
+			await Promise.all([
+				Service.find(),
+				Product.find(),
+				Testimonial.find(),
+				GalleryItem.find(),
+			]);
+
+		services = manyToPlain(dbServices) || [];
+		products = manyToPlain(dbProducts) || [];
+		testimonials = manyToPlain(dbTestimonials) || [];
+		galeria = manyToPlain(dbGallery) || [];
 	} catch (err) {
-		console.error("Error cargando página principal:", err);
-		res.status(500).send("Error cargando datos");
+		console.warn("No se pudo cargar desde MongoDB:", err.message);
 	}
+
+	if (services.length === 0) {
+		services = readJsonFromDataFolder("services") || [];
+	}
+	if (products.length === 0) {
+		products = readJsonFromDataFolder("products") || [];
+	}
+	if (testimonials.length === 0) {
+		testimonials = readJsonFromDataFolder("testimonials") || [];
+	}
+	if (galeria.length === 0) {
+		galeria = readJsonFromDataFolder("gallery") || [];
+	}
+
+	res.render("index", {
+		services,
+		products,
+		testimonials,
+		galeria,
+		cloudName: getCloudName(),
+		pagoActivo: isPagoActivo(),
+	});
 });
 
 // ===========================
